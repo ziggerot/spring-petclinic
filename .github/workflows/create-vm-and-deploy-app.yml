@@ -1,0 +1,59 @@
+on: [push]
+
+  name: Create Custom VM Image
+
+  jobs:
+    build-image:
+      runs-on: ubuntu-latest
+      strategy:
+        matrix:
+          java: ['17']
+
+      steps:
+      - name: Checkout
+        uses: actions/checkout@v3  
+
+      - name: Login via Az module
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Set up JDK ${{matrix.java}}
+        uses: actions/setup-java@v2
+        with:
+          java-version: ${{matrix.java}}
+          distribution: 'adopt'
+          cache: maven
+      - name: Build with Maven Wrapper
+        run: ./mvnw -B package
+          
+      - name: Build Java
+        run: mvn --batch-mode --update-snapshots verify
+
+      - run: mkdir staging && cp target/*.jar staging
+      - uses: actions/upload-artifact@v2
+        with:
+          name: Package
+          path: staging
+
+      - name: Create App Baked Image
+        id: imageBuilder
+        uses: azure/build-vm-image@v0
+        with:
+          location: 'westus2'
+          resource-group-name: 'Image-Gallery'
+          managed-identity: 'UAI1' # Managed identity
+          source-os-type: 'windows'
+          source-image-type: 'platformImage'
+          source-image: MicrosoftWindowsServer:WindowsServer:2019-Datacenter:latest #unique identifier of source image
+          dist-type: 'SharedImageGallery'
+          dist-resource-id: '/subscriptions/${{ secrets.AZURE_SUBSCRIPTION_ID }}/resourceGroups/Image-Gallery/providers/Microsoft.Compute/galleries/testing_image_gallery/images/windows-test-image/versions/0.1.${{ GITHUB.RUN_ID }}' #Replace with the resource id of your shared image  gallery's image definition
+          dist-location: 'westus2'
+
+      - name: CREATE VM
+        uses: azure/CLI@v1
+        with:
+          azcliversion: 2.0.72
+          inlineScript: az vm create --resource-group Image-Gallery --name "app-vm-${{ GITHUB.RUN_NUMBER }}"  --admin-username dev --admin-password "${{ secrets.VM_PWD }}" --location  westus2 --image "${{ steps.imageBuilder.outputs.custom-image-uri }}"
