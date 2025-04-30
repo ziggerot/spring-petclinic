@@ -3,6 +3,10 @@ name: "Create Custom VM Image"
 on: 
   [push]
 
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
   build-image:
     runs-on: ubuntu-latest
