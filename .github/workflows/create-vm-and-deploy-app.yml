@@ -47,7 +47,7 @@ jobs:
         name: Package
         path: staging
 
-    - name: Create App Baked Image
+    - name: Create App Baked Image 
       id: imageBuilder
       uses: azure/build-vm-image@v0
       with:
