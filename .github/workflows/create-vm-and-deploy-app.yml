@@ -52,13 +52,13 @@ jobs:
       uses: azure/build-vm-image@v0
       with:
         location: 'westus2'
-        resource-group-name: 'Image-Gallery'
+        resource-group-name: 'image-gallery'
         managed-identity: 'UAI1' # Managed identity
         source-os-type: 'windows'
         source-image-type: 'platformImage'
         source-image: MicrosoftWindowsServer:WindowsServer:2019-Datacenter:latest #unique identifier of source image
         dist-type: 'SharedImageGallery'
-        dist-resource-id: '/subscriptions/${{ secrets.AZURE_SUBSCRIPTION_ID }}/resourceGroups/Image-Gallery/providers/Microsoft.Compute/galleries/testing_image_gallery/images/windows-test-image/versions/0.1.${{ GITHUB.RUN_ID }}' #Replace with the resource id of your shared image  gallery's image definition
+        dist-resource-id: '/subscriptions/${{ secrets.AZURE_SUBSCRIPTION_ID }}/resourceGroups/image-gallery/providers/Microsoft.Compute/galleries/testing_image_gallery/images/windows-test-image/versions/0.1.${{ GITHUB.RUN_ID }}' #Replace with the resource id of your shared image  gallery's image definition
         dist-location: 'westus2'
 
     - name: CREATE VM
