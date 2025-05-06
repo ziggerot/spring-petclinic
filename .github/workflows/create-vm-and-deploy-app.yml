@@ -56,7 +56,7 @@ jobs:
         managed-identity: 'UAI1' # Managed identity
         source-os-type: 'windows'
         source-image-type: 'platformImage'
-        source-image: MicrosoftWindowsServer:WindowsServer:2019-datacenter-g2:latest #unique identifier of source image
+        source-image: MicrosoftWindowsServer:WindowsServer:2019-datacenter:latest #unique identifier of source image
         dist-type: 'SharedImageGallery'
         dist-resource-id: '/subscriptions/${{ secrets.AZURE_SUBSCRIPTION_ID }}/resourceGroups/image-gallery/providers/Microsoft.Compute/galleries/testing_image_gallery/images/windows_test_image2/versions/0.1.${{ GITHUB.RUN_ID }}' #Replace with the resource id of your shared image  gallery's image definition
         dist-location: 'westus2'
